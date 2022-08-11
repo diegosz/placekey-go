@@ -16,7 +16,7 @@ const (
 	earthRadius            float64 = 6371.0 // km
 	resolution             int     = 10
 	baseResolution         int     = 12
-	baseCellShift          uint64  = 1 << (3 * 15)
+	baseCellIncrement      uint64  = 1 << (3 * 15)
 	unusedResolutionFiller uint64  = 1<<(3*(15-12)) - 1 // 15-baseResolution
 	alphabet               string  = "23456789bcdfghjkmnpqrstvwxyz"
 	alphabetLength         int64   = 28
@@ -276,7 +276,7 @@ func (pk *PlaceKey) decodeString(s string) int64 {
 // base resolution.
 func (pk *PlaceKey) shortenH3Int(h3Int uint64) int64 {
 	// cuts off the 12 left-most bits that don't code location
-	out := (h3Int + baseCellShift) % (1 << 52)
+	out := (h3Int + baseCellIncrement) % (1 << 52)
 	// cuts off the rightmost bits corresponding to resolutions greater than the base resolution
 	out >>= (3 * (15 - baseResolution))
 	return int64(out)
@@ -284,7 +284,7 @@ func (pk *PlaceKey) shortenH3Int(h3Int uint64) int64 {
 
 func (pk *PlaceKey) unshortenH3Int(shortH3Int int64) uint64 {
 	unShiftedInt := shortH3Int << (3 * (15 - baseResolution))
-	rebuiltInt := pk.headerInt + unusedResolutionFiller - baseCellShift + uint64(unShiftedInt)
+	rebuiltInt := pk.headerInt + unusedResolutionFiller - baseCellIncrement + uint64(unShiftedInt)
 	return rebuiltInt
 }
 
