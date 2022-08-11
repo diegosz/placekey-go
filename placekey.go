@@ -309,7 +309,6 @@ func (pk *PlaceKey) dirtyString(s string) string {
 		// replacement should be in reversed order
 		if strings.Contains(s, v) {
 			s = strings.ReplaceAll(s, v, k)
-			fmt.Println(s, v, k)
 		}
 	}
 	return s
