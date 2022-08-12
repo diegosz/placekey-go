@@ -50,8 +50,8 @@ func (c *H3) ToGeo(h H3Index) GeoCoord {
 	cg := ch3.TGeoCoord{}
 	ch3.Xh3ToGeo(c.TLS, ch3.TH3Index(h), uintptr(unsafe.Pointer(&cg)))
 	g := GeoCoord{}
-	g.Latitude = rad2deg * float64(cg.Flat)
-	g.Longitude = rad2deg * float64(cg.Flon)
+	g.Latitude = rad2deg * cg.Flat
+	g.Longitude = rad2deg * cg.Flon
 	return g
 }
 
