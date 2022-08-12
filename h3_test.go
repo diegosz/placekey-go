@@ -233,3 +233,43 @@ func BenchmarkH3PlacekeyToGeo(b *testing.B) {
 		_, _, _ = c.ToGeo("@5vg-7gq-tvz")
 	}
 }
+
+func TestH3ToGeoIssues(t *testing.T) {
+	c := NewH3()
+	defer c.Close()
+	tests := []struct {
+		name    string
+		h3Index string
+		wantLat float64
+		wantLng float64
+		wantErr bool
+	}{
+		{
+			// https://github.com/uber/h3-go/issues/7
+			name:    "ToGeo function return values inconsistent #7",
+			h3Index: "8c194ad30d067ff",
+			wantLat: 51.523416454245556,
+			wantLng: -0.08106823052469281,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			x, err := FromH3String(tt.h3Index)
+			if err != nil {
+				t.Fatal(err)
+			}
+			gotLat, gotLng, err := c.ToGeo(x)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ToGeo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !almostEqual(gotLat, tt.wantLat) {
+				t.Errorf("ToGeo() gotLat = %v, want %v", gotLat, tt.wantLat)
+			}
+			if !almostEqual(gotLng, tt.wantLng) {
+				t.Errorf("ToGeo() gotLng = %v, want %v", gotLng, tt.wantLng)
+			}
+		})
+	}
+}
