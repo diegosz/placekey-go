@@ -74,10 +74,10 @@ func TestToGeo(t *testing.T) {
 				return
 			}
 			if !almostEqual(gotLat, tt.wantLat) {
-				t.Errorf("ToGeo() got = %v, want %v", gotLat, tt.wantLat)
+				t.Errorf("ToGeo() gotLat = %v, want %v", gotLat, tt.wantLat)
 			}
 			if !almostEqual(gotLng, tt.wantLng) {
-				t.Errorf("ToGeo() got1 = %v, want %v", gotLng, tt.wantLng)
+				t.Errorf("ToGeo() gotLng = %v, want %v", gotLng, tt.wantLng)
 			}
 		})
 	}
