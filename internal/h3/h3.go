@@ -65,8 +65,8 @@ func (c *H3) ToGeoBoundary(h H3Index) []GeoCoord {
 	gs := make([]GeoCoord, 0, gb.FnumVerts)
 	for i := 0; i < int(gb.FnumVerts); i++ {
 		g := GeoCoord{}
-		g.Latitude = rad2deg * float64(gb.Fverts[i].Flat)
-		g.Longitude = rad2deg * float64(gb.Fverts[i].Flon)
+		g.Latitude = rad2deg * gb.Fverts[i].Flat
+		g.Longitude = rad2deg * gb.Fverts[i].Flon
 		gs = append(gs, g)
 	}
 	return gs
