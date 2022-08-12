@@ -56,7 +56,7 @@ func (c *H3) ToGeo(h H3Index) GeoCoord {
 }
 
 func (c *H3) ToString(h H3Index) string {
-	return strconv.FormatUint(uint64(h), 16)
+	return strconv.FormatUint(uint64(h), 16) //nolint:gomnd
 }
 
 func (c *H3) ToGeoBoundary(h H3Index) []GeoCoord {
