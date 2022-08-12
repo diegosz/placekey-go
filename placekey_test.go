@@ -204,13 +204,13 @@ func TestToHexagonalBoundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := pk.ToHexagonalBoundary(tt.h3Index)
+			got, err := pk.ToGeoBoundary(tt.h3Index)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ToHexagonalBoundary() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ToGeoBoundary() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToHexagonalBoundary() got = %v, want %v", got, tt.want)
+				t.Errorf("ToGeoBoundary() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -164,9 +164,9 @@ func (pk *PlaceKey) GetPrefixDistanceMap() map[int]float64 {
 	}
 }
 
-// ToHexagonalBoundary returns the hexagonal polygon boundary of a PlaceKey as a
-// slice of (latitude, longitude) coordinates.
-func (pk *PlaceKey) ToHexagonalBoundary(placeKey string) ([][]float64, error) {
+// ToGeoBoundary returns the hexagonal polygon boundary of a PlaceKey as a slice
+// of (latitude, longitude) coordinates.
+func (pk *PlaceKey) ToGeoBoundary(placeKey string) ([][]float64, error) {
 	x, err := pk.ToH3Index(placeKey)
 	if err != nil {
 		return nil, err
