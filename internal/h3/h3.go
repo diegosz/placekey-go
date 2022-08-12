@@ -72,6 +72,8 @@ func (c *H3) ToGeoBoundary(h Index) []GeoCoord {
 	return gs
 }
 
+// IsValid returns whether or not an H3 index is a valid cell (hexagon or
+// pentagon).
 func (c *H3) IsValid(h Index) bool {
 	return ch3.Xh3IsValid(c.TLS, ch3.TH3Index(h)) == 1
 }
