@@ -327,6 +327,6 @@ func (pk *PlaceKey) radians(degrees float64) float64 {
 }
 
 // degrees converts radians to degrees
-func (pk *PlaceKey) degrees(radians float64) float64 {
+func (pk *PlaceKey) degrees(radians float64) float64 { //nolint:deadcode,unused
 	return radians / math.Pi * 180
 }
