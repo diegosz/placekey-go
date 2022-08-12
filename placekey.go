@@ -84,12 +84,12 @@ func (pk *PlaceKey) ToGeo(placeKey string) (lat, lng float64, err error) {
 	if err != nil {
 		return 0.0, 0.0, err
 	}
-	geo := pk.h3.ToGeo(h3.H3Index(x))
+	geo := pk.h3.ToGeo(h3.Index(x))
 	return geo.Latitude, geo.Longitude, nil
 }
 
 // FromH3Index converts an H3 index into a PlaceKey string.
-func (pk *PlaceKey) FromH3Index(index h3.H3Index) (string, error) {
+func (pk *PlaceKey) FromH3Index(index h3.Index) (string, error) {
 	return pk.encodeH3Int(uint64(index)), nil
 }
 
@@ -108,12 +108,12 @@ func (pk *PlaceKey) FromH3Int(h3Int uint64) (string, error) {
 }
 
 // ToH3Index converts a PlaceKey string into an H3 index.
-func (pk *PlaceKey) ToH3Index(placeKey string) (h3.H3Index, error) {
+func (pk *PlaceKey) ToH3Index(placeKey string) (h3.Index, error) {
 	_, where, err := pk.parsePlacekey(placeKey)
 	if err != nil {
 		return 0, err
 	}
-	x := h3.H3Index(pk.decodeToH3Int(where))
+	x := h3.Index(pk.decodeToH3Int(where))
 	return x, nil
 }
 
