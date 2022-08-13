@@ -13,6 +13,7 @@ import (
 
 const (
 	resolution             int    = 10
+	maxResolution          int    = 15
 	baseResolution         int    = 12
 	baseCellIncrement      uint64 = 1 << (3 * 15)
 	unusedResolutionFiller uint64 = 1<<(3*(15-12)) - 1 // 15-baseResolution
@@ -24,6 +25,7 @@ const (
 	replacementChars       string = "eu"
 )
 
+var ErrInvalidResolution = errors.New("invalid resolution")
 var ErrInvalidParts = errors.New("invalid parts")
 
 var (
@@ -77,6 +79,13 @@ func FromH3String(h3String string) (string, error) {
 
 // FromH3Int converts an H3 integer into a PlaceKey.
 func FromH3Int(h3Int uint64) (string, error) {
+	if inferResolution(h3Int) != resolution {
+		return "", ErrInvalidResolution
+	}
+	return encodeH3Int(h3Int), nil
+}
+
+func fromH3IntUnvalidatedResolution(h3Int uint64) (string, error) {
 	return encodeH3Int(h3Int), nil
 }
 
@@ -243,6 +252,23 @@ func dirtyString(s string) string {
 		}
 	}
 	return s
+}
+
+func inferResolution(h3Int uint64) int {
+	// resolution can be inferred from the number of digits in the cells bit
+	// layout which are not 0b111, as the digit value can only be 0b111 when
+	// that digit is greater than the resolution of the index
+	cells := h3Int
+	res := maxResolution
+	for i := maxResolution; i >= 0; i-- {
+		d := cells & 7 // 0b111
+		if d != 7 {
+			break
+		}
+		cells >>= 3
+		res--
+	}
+	return res
 }
 
 func power64(base int64, exponent int) int64 {

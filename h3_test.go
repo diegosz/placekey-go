@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -200,7 +201,7 @@ func BenchmarkH3_PlacekeyToGeo(b *testing.B) {
 func TestH3_ToGeoIssues(t *testing.T) {
 	tests := []struct {
 		name    string
-		h3Index string
+		h3Int   uint64
 		wantLat float64
 		wantLng float64
 		wantErr bool
@@ -208,7 +209,7 @@ func TestH3_ToGeoIssues(t *testing.T) {
 		{
 			// https://github.com/uber/h3-go/issues/7
 			name:    "ToGeo function return values inconsistent #7",
-			h3Index: "8c194ad30d067ff",
+			h3Int:   630948894377797631, // "8c194ad30d067ff"
 			wantLat: 51.523416454245556,
 			wantLng: -0.08106823052469281,
 			wantErr: false,
@@ -218,7 +219,7 @@ func TestH3_ToGeoIssues(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewH3()
 			defer c.Close()
-			x, err := FromH3String(tt.h3Index)
+			x, err := fromH3IntUnvalidatedResolution(tt.h3Int)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -287,24 +288,73 @@ func TestH3_ToGeoIssues(t *testing.T) {
 func ExampleH3_ToGeoBoundary() {
 	c := NewH3()
 	defer c.Close()
-	pk, err := FromH3String("8a2a1072b59ffff") // "@627-wc5-z2k" // 622236750694711295
-	if err != nil {
-		fmt.Println(err)
+	tests := []struct {
+		name    string
+		h3Index string
+		level   int
+		want    [][]float64
+		wantErr bool
+	}{
+		{
+			name:    "8a2a1072b59ffff",
+			h3Index: "8a2a1072b59ffff", // "@627-wc5-z2k" // 622236750694711295
+			level:   0,
+			want: [][]float64{
+				{40.6900586009536, -74.04415176176158},
+				{40.689907694525196, -74.04506179239633},
+				{40.689270936043556, -74.04534141750702},
+				{40.688785090724046, -74.04471103053613},
+				{40.68893599264273, -74.04380102076256},
+				{40.689572744390546, -74.04352137709905},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "pentagon resolution 10",
+			h3Index: "8ac200000007fff",
+			level:   0,
+			want: [][]float64{
+				{-39.100455452692714, -57.70029017862053},
+				{-39.10035523525216, -57.69953126249851},
+				{-39.09976414050208, -57.69941956740002},
+				{-39.09949904241486, -57.70010944253918},
+				{-39.09992629443885, -57.700647510006675},
+			},
+			wantErr: false,
+		},
 	}
-	lat, lng, err := c.ToGeo(pk)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Printf("center: {%s, %s}\n", strconv.FormatFloat(lat, 'f', -1, 64), strconv.FormatFloat(lng, 'f', -1, 64))
-	gb, err := c.ToGeoBoundary(pk)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("boundary:")
-	for _, v := range gb {
-		fmt.Printf("{%s, %s},\n", strconv.FormatFloat(v[0], 'f', -1, 64), strconv.FormatFloat(v[1], 'f', -1, 64))
+	for _, tt := range tests {
+		fmt.Println(tt.name)
+		pk, err := FromH3String(tt.h3Index)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		lat, lng, err := c.ToGeo(pk)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Printf("center: {%s, %s}\n", strconv.FormatFloat(lat, 'f', -1, 64), strconv.FormatFloat(lng, 'f', -1, 64))
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		got, err := c.ToGeoBoundary(pk)
+		fmt.Println("boundary:")
+		if (err != nil) != tt.wantErr {
+			fmt.Println(err)
+			continue
+		}
+		for _, v := range got {
+			fmt.Printf("{%s, %s},\n", strconv.FormatFloat(v[0], 'f', -1, 64), strconv.FormatFloat(v[1], 'f', -1, 64))
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			fmt.Printf("ToGeoBoundary() got = %v, want %v\n", got, tt.want)
+		}
 	}
 	// Output:
+	// 8a2a1072b59ffff
 	// center: {40.68942184369931, -74.04443139990863}
 	// boundary:
 	// {40.6900586009536, -74.04415176176158},
@@ -313,4 +363,12 @@ func ExampleH3_ToGeoBoundary() {
 	// {40.688785090724046, -74.04471103053613},
 	// {40.68893599264273, -74.04380102076256},
 	// {40.689572744390546, -74.04352137709905},
+	// pentagon resolution 10
+	// center: {-39.1000000339759, -57.69999959221297}
+	// boundary:
+	// {-39.100455452692714, -57.70029017862053},
+	// {-39.10035523525216, -57.69953126249851},
+	// {-39.09976414050208, -57.69941956740002},
+	// {-39.09949904241486, -57.70010944253918},
+	// {-39.09992629443885, -57.700647510006675},
 }

@@ -2,6 +2,7 @@ package placekey
 
 import (
 	_ "embed"
+	"strconv"
 	"testing"
 )
 
@@ -212,6 +213,67 @@ func TestFormatIsValid(t *testing.T) {
 			got := FormatIsValid(tt.placeKey)
 			if got != tt.want {
 				t.Errorf("FormatIsValid() got = %v; expected %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInferResolution(t *testing.T) {
+	tests := []struct {
+		name    string
+		h3Index string
+		want    int
+	}{
+		{
+			name:    "8a2a1072b59ffff",
+			h3Index: "8a2a1072b59ffff",
+			want:    10,
+		},
+		{
+			name:    "pentagon resolution 1",
+			h3Index: "81c23ffffffffff",
+			want:    1,
+		},
+		{
+			name:    "pentagon resolution 10",
+			h3Index: "8ac200000007fff",
+			want:    10,
+		},
+		{
+			name:    "EXO resolution 10",
+			h3Index: "8ac2e31064effff",
+			want:    10,
+		},
+		{
+			name:    "EXO resolution 1",
+			h3Index: "81c2fffffffffff",
+			want:    1,
+		},
+		{
+			name:    "EXO resolution 9",
+			h3Index: "89c2e31064fffff",
+			want:    9,
+		},
+		{
+			name:    "EXO resolution 11",
+			h3Index: "8bc2e31064ebfff",
+			want:    11,
+		},
+		{
+			name:    "EXO resolution 15",
+			h3Index: "8fc2e31064eb8e4",
+			want:    15,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			x, err := strconv.ParseUint(tt.h3Index, 16, 64)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := inferResolution(x)
+			if got != tt.want {
+				t.Errorf("inferResolution() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
