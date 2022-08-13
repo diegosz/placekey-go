@@ -22,8 +22,7 @@ type GeoCoord struct {
 
 type GeoPolygon struct {
 	Geofence []GeoCoord
-
-	Holes [][]GeoCoord
+	Holes    [][]GeoCoord
 }
 
 type H3 struct {

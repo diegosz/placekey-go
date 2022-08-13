@@ -2,8 +2,8 @@ package placekey
 
 import (
 	_ "embed"
+	"fmt"
 	"math"
-	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -21,9 +21,7 @@ func almostEqual(a, b float64) bool {
 	return math.Abs(a-b) <= tolerance
 }
 
-func TestH3IsValid(t *testing.T) {
-	c := NewH3()
-	defer c.Close()
+func TestH3_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
 		placeKey string
@@ -39,6 +37,8 @@ func TestH3IsValid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := NewH3()
+			defer c.Close()
 			x, err := ToH3Index(tt.placeKey)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ToH3Index() error = %v, wantErr %v", err, tt.wantErr)
@@ -52,9 +52,7 @@ func TestH3IsValid(t *testing.T) {
 	}
 }
 
-func TestH3ToGeo(t *testing.T) {
-	c := NewH3()
-	defer c.Close()
+func TestH3_ToGeo(t *testing.T) {
 	tests := []struct {
 		name     string
 		placeKey string
@@ -86,6 +84,8 @@ func TestH3ToGeo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := NewH3()
+			defer c.Close()
 			gotLat, gotLng, err := c.ToGeo(tt.placeKey)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ToGeo() error = %v, wantErr %v", err, tt.wantErr)
@@ -101,44 +101,7 @@ func TestH3ToGeo(t *testing.T) {
 	}
 }
 
-func TestH3ToGeoBoundary(t *testing.T) {
-	c := NewH3()
-	defer c.Close()
-	tests := []struct {
-		name    string
-		h3Index string
-		want    []struct{ Lat, Lng float64 }
-		wantErr bool
-	}{
-		{
-			name:    "0,0",
-			h3Index: "8a2a1072b59ffff",
-			want: []struct{ Lat, Lng float64 }{
-				{40.690058601, -74.044151762},
-				{40.689907695, -74.045061792},
-				{40.689270936, -74.045341418},
-				{40.688785091, -74.044711031},
-				{40.688935993, -74.043801021},
-				{40.689572744, -74.043521377},
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := c.ToGeoBoundary(tt.h3Index)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ToGeoBoundary() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToGeoBoundary() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestH3Distance(t *testing.T) {
+func TestH3_Distance(t *testing.T) {
 	c := NewH3()
 	defer c.Close()
 	lines := strings.Split(string(exampleDistanceTSV), "\n")
@@ -174,7 +137,7 @@ func TestH3Distance(t *testing.T) {
 	}
 }
 
-func TestH3FromGeoToGeo(t *testing.T) {
+func TestH3_FromGeoToGeo(t *testing.T) {
 	c := NewH3()
 	defer c.Close()
 	lines := strings.Split(string(exampleGeosCSV), "\n")
@@ -218,7 +181,7 @@ func TestH3FromGeoToGeo(t *testing.T) {
 	}
 }
 
-func BenchmarkH3GeoToPlacekey(b *testing.B) {
+func BenchmarkH3_GeoToPlacekey(b *testing.B) {
 	c := NewH3()
 	defer c.Close()
 	for i := 0; i < b.N; i++ {
@@ -226,7 +189,7 @@ func BenchmarkH3GeoToPlacekey(b *testing.B) {
 	}
 }
 
-func BenchmarkH3PlacekeyToGeo(b *testing.B) {
+func BenchmarkH3_PlacekeyToGeo(b *testing.B) {
 	c := NewH3()
 	defer c.Close()
 	for i := 0; i < b.N; i++ {
@@ -234,9 +197,7 @@ func BenchmarkH3PlacekeyToGeo(b *testing.B) {
 	}
 }
 
-func TestH3ToGeoIssues(t *testing.T) {
-	c := NewH3()
-	defer c.Close()
+func TestH3_ToGeoIssues(t *testing.T) {
 	tests := []struct {
 		name    string
 		h3Index string
@@ -255,6 +216,8 @@ func TestH3ToGeoIssues(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := NewH3()
+			defer c.Close()
 			x, err := FromH3String(tt.h3Index)
 			if err != nil {
 				t.Fatal(err)
@@ -272,4 +235,82 @@ func TestH3ToGeoIssues(t *testing.T) {
 			}
 		})
 	}
+}
+
+// func TestH3_ToGeoBoundary(t *testing.T) {
+// 	tests := []struct {
+// 		name    string
+// 		h3Index string
+// 		want    [][]float64
+// 		wantErr bool
+// 	}{
+// 		{
+// 			name:    "8a2a1072b59ffff",
+// 			h3Index: "8a2a1072b59ffff", // "@627-wc5-z2k" // 622236750694711295
+// 			want: [][]float64{
+// 				{40.6900586009536, -74.04415176176158},
+// 				{40.689907694525196, -74.04506179239633},
+// 				{40.689270936043556, -74.04534141750702},
+// 				{40.688785090724046, -74.04471103053613},
+// 				{40.68893599264273, -74.04380102076256},
+// 				{40.689572744390546, -74.04352137709905},
+// 			},
+// 			wantErr: false,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			c := NewH3()
+// 			defer c.Close()
+// 			pk, err := FromH3String(tt.h3Index)
+// 			if err != nil {
+// 				t.Fatal(err)
+// 			}
+// 			got, err := c.ToGeoBoundary(pk)
+// 			if (err != nil) != tt.wantErr {
+// 				t.Errorf("ToGeoBoundary() error = %v, wantErr %v", err, tt.wantErr)
+// 				return
+// 			}
+// 			if !reflect.DeepEqual(got, tt.want) {
+// 				t.Errorf("ToGeoBoundary() got = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }
+
+// FIXME: The above TestH3ToGeoBoundary test is not working as expected.
+// It works fine in debug mode, but fails to run in testing.
+// ToGeoBoundary returns empty. Something smells...
+// The below example test ExampleH3_ToGeoBoundary is a working fine.
+// Also running in an executable binary works fine, at least for the moment...
+
+func ExampleH3_ToGeoBoundary() {
+	c := NewH3()
+	defer c.Close()
+	pk, err := FromH3String("8a2a1072b59ffff") // "@627-wc5-z2k" // 622236750694711295
+	if err != nil {
+		fmt.Println(err)
+	}
+	lat, lng, err := c.ToGeo(pk)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("center: {%s, %s}\n", strconv.FormatFloat(lat, 'f', -1, 64), strconv.FormatFloat(lng, 'f', -1, 64))
+	gb, err := c.ToGeoBoundary(pk)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("boundary:")
+	for _, v := range gb {
+		fmt.Printf("{%s, %s},\n", strconv.FormatFloat(v[0], 'f', -1, 64), strconv.FormatFloat(v[1], 'f', -1, 64))
+	}
+	// Output:
+	// center: {40.68942184369931, -74.04443139990863}
+	// boundary:
+	// {40.6900586009536, -74.04415176176158},
+	// {40.689907694525196, -74.04506179239633},
+	// {40.689270936043556, -74.04534141750702},
+	// {40.688785090724046, -74.04471103053613},
+	// {40.68893599264273, -74.04380102076256},
+	// {40.689572744390546, -74.04352137709905},
 }

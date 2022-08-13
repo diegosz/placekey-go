@@ -12,11 +12,11 @@ This package requires **Go 1.18** or later.
 
 ## Prerequisites
 
-The library [uber/h3-go](https://github.com/uber/h3-go) requires [CGO](https://golang.org/cmd/cgo/) (```CGO_ENABLED=1```) in order to be built.
-
-This library uses the amazing [akhenakh/goh3](https://github.com/akhenakh/goh3) native Go h3 port build using ccgo.
+This library uses the amazing [akhenakh/goh3](https://github.com/akhenakh/goh3) native Go h3 port build using ccgo, so CGO is not required to be enabled.
 
 > This is still an experiment, use at your own risk
+
+The library [uber/h3-go](https://github.com/uber/h3-go) requires [CGO](https://golang.org/cmd/cgo/) (```CGO_ENABLED=1```) in order to be built, we don't need it here.
 
 ## References
 
@@ -28,3 +28,15 @@ This library uses the amazing [akhenakh/goh3](https://github.com/akhenakh/goh3) 
 - <https://github.com/ringsaturn/pk>
 - <https://github.com/akhenakh/goh3>
 - <https://blog.nobugware.com/post/2022/surprising-result-while-transpiling-go/>
+
+## FIXME
+
+The TestH3ToGeoBoundary test is not working as expected. It works fine in debug mode, but fails to run in testing.
+
+ToGeoBoundary returns empty. Something smells...
+
+The example test ExampleH3_ToGeoBoundary is a working fine. Also running in an executable binary works fine, at least for the moment...
+
+May be something related to the [thread-local storage](https://groups.google.com/g/golang-nuts/c/tGamryo50BY).
+
+¯\\_(ツ)_/¯
