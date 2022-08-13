@@ -137,7 +137,7 @@ func TestH3_Distance(t *testing.T) {
 	}
 }
 
-func TestH3_FromGeoToGeo(t *testing.T) {
+func TestH3_FromGeo_ToGeo(t *testing.T) {
 	c := NewH3()
 	defer c.Close()
 	lines := strings.Split(string(exampleGeosCSV), "\n")
@@ -278,10 +278,10 @@ func TestH3_ToGeoIssues(t *testing.T) {
 // 	}
 // }
 
-// FIXME: The above TestH3ToGeoBoundary test is not working as expected.
+// FIXME: The above TestH3_ToGeoBoundary test is not working as expected.
 // It works fine in debug mode, but fails to run in testing.
 // ToGeoBoundary returns empty. Something smells...
-// The below example test ExampleH3_ToGeoBoundary is a working fine.
+// The example test ExampleH3_ToGeoBoundary below is a working fine.
 // Also running in an executable binary works fine, at least for the moment...
 
 func ExampleH3_ToGeoBoundary() {

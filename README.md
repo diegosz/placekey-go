@@ -31,7 +31,7 @@ The library [uber/h3-go](https://github.com/uber/h3-go) requires [CGO](https://g
 
 ## FIXME
 
-The TestH3ToGeoBoundary test is not working as expected. It works fine in debug mode, but fails to run in testing.
+The TestH3_ToGeoBoundary test is not working as expected. It works fine in debug mode, but fails to run in testing.
 
 ToGeoBoundary returns empty. Something smells...
 
